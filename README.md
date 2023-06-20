@@ -13,7 +13,9 @@ The corpus of tweets has been scraped with the scraper snscrape.
 
 For more information on snscrape, please check: https://github.com/JustAnotherArchivist/snscrape
 
-Duplicates are dropped manually with contains string.
+The corpus of news articles has been scraped with webchromedriver.
+
+The corpus of descriptions of news articles has been scraped with the Naver API.
 
 mecab.nouns function is used.
 
