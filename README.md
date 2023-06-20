@@ -21,7 +21,7 @@ mecab.nouns function is used.
 
 .Usage
 
-1) word embeddings
+1) Word embeddings
 2) Topic modeling
 3) Dynamic, seeded topic modeling
 
