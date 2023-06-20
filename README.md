@@ -25,5 +25,5 @@ mecab.nouns function is used.
 
 .Results
 
-Results are limited by the presence of duplicates in the tweets.
+Results are limited by the overlapping of topics.
 
