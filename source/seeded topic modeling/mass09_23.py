@@ -1,9 +1,8 @@
-
 #jupyter notebook
-#before starting: #conda activate env_full2
+#before starting: #conda activate environment
+#BERTopic model in one step, for the scraped news articles
 
 # %%
-
 
 import re
 import pandas as pd
@@ -17,37 +16,22 @@ from bertopic.representation import MaximalMarginalRelevance
 from umap import UMAP
 from hdbscan import HDBSCAN
 from bertopic.vectorizers import ClassTfidfTransformer
-
-import pandas as pd
 import glob
 import os
-import re  
-import numpy as np
 from datetime import datetime
 import dateutil.parser as parser  
-
-
-#df=pd.read_csv('massmedia2018_2023.csv', parse_dates=['date']) 
+ 
 df=pd.read_csv('massmedia2009_2023.csv', parse_dates=['date']) 
-#df=pd.read_csv('massmedia2009_2017.csv', parse_dates=['date']) 
-#df=pd.read_csv('massmedia2022_2023.csv', parse_dates=['date']) 
-
-#df=df.dropna()
-
+df=df.dropna()
 timestamps = df['date'].tolist()
-
-
-
 
 # %%
 df['texts'] = df['texts'].astype(str)
 df.head(5)
 
-
 # %%
 
 documents = df['texts'].astype(str)
-
 
 documents = [line.strip() for line in df.texts]
 preprocessed_documents = []
@@ -122,29 +106,27 @@ seed_topic_list = [['실업', '일자리', '작업 경쟁','취업 경쟁','직�
 custom_tokenizer = CustomTokenizer(Mecab())
 vectorizer = CountVectorizer(tokenizer=custom_tokenizer, max_features=3000)
 
-
 umap_model = UMAP(n_neighbors=30, n_components=8, min_dist=0.0, metric='cosine') 
-
 
 model = BERTopic(embedding_model="sentence-transformers/xlm-r-100langs-bert-base-nli-stsb-mean-tokens", \
                  vectorizer_model=vectorizer,
                  umap_model=umap_model,            
                  seed_topic_list=seed_topic_list,
-                 #min_topic_size=35,
                  nr_topics=31,
                  top_n_words=20,
                  calculate_probabilities=True)
 
 
-
-
-topics, probs = model.fit_transform(documents) # Train your BERTopic model
+topics, probs = model.fit_transform(documents) # Train the BERTopic model
 
 model.save('massmedia2009_2023.h5')
+
+# %%
 
 for i in range(0, 33): 
   print(i,'번째 토픽 :', model.get_topic(i))
 
+# %%
 
 similar_topics, similarity = \
 model.find_topics("여성", top_n = 10) 
@@ -167,9 +149,7 @@ model.get_topics()
 model.generate_topic_labels()
 
 
-
 # %%
-
 
 
 fig = model.visualize_barchart()
@@ -201,7 +181,7 @@ fig = model.visualize_term_rank(log_scale=True)
 fig.write_html("massmedia2009_2023junenewslogtermrank.html")
 fig.show()
 
-#junemassmedia2009_2023news
+
 # %%
 
 topics_over_time = model.topics_over_time(documents, timestamps)
@@ -209,7 +189,3 @@ fig = model.visualize_topics_over_time(topics_over_time)
 fig.write_html("massmedia2009_2023junenewstopicstime.html")
 fig.show()
 
-
-
-
-# %%
