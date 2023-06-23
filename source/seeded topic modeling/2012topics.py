@@ -1,30 +1,7 @@
-#before starting: #conda activate env_full2
+#code for visual studio code, python
+#BERTopic model, in one step
+#before starting, conda activate environment
 
-#refugeenewstitles.csv
-#migrantnewstitles.csv
-#immigrantnewstitles.csv
-#marriagemigrantnewstitles.csv
-#illmigrantnewstitles.csv
-#womenmigrantnewstitles.csv
-#foreignersnewstitles.csv
-#foreignermigrantsnewstitles.csv
-#irregularmigrantsnewstitles.csv
-#immigrantworkersnewstitles.csv
-
-#allnewsarticles.csv
-#migrantnewsarticles.csv
-#marriageandwomennewsarticles.csv
-
-
-#ompare with: 
-#cleanedillmigrantnewstitles.csv
-#cleanedrefugeenewstitles.csv
-#cleanedmarriagemigrantnewstitles.csv
-#cleanedwomenmigrantnewstitles.csv
-
-#alldescription.csv
-
-#
 # %% 
 
 import re
@@ -39,29 +16,19 @@ from bertopic.representation import MaximalMarginalRelevance
 from umap import UMAP
 from hdbscan import HDBSCAN
 from bertopic.vectorizers import ClassTfidfTransformer
-
-import pandas as pd
 import glob
 import os
-import re  
-import numpy as np
 from datetime import datetime
 import dateutil.parser as parser  
 
-
-#df=df.set_axis(['Raw_Tweet', 'removed'], axis=1, inplace=False)[["Raw_Tweet"]].astype(str)
-
-
-df=pd.read_csv('tweets2012.csv', parse_dates=['Date'], lineterminator='\n') 
+df=pd.read_csv('tweets2012.csv', parse_dates=['Date'], lineterminator='\n')  #replace with own dataset
 
 df=df.dropna()
 
 timestamps = df['Date'].tolist()
 
-
-
-#make a function to clean text from unwanted characters
-file = open('stopwords.txt', 'r')
+#function to clean text from unwanted characters
+file = open('stopwords.txt', 'r')  # list of Korean stopwords is in this github project
 words = file.read()
 file.close()
 stopwords = list(words.split())
@@ -78,7 +45,7 @@ def clean_text(text):
     text = re.sub(r'@[A-Za-z0-9]+', ' ', text) #(if the below works, we can erase this)
     # Remove user @ references and '#' from tweet
     text = re.sub(r'\@\w+|\#|\d+', ' ', text)
-    # Remove noice
+    # Remove noise
     text = re.sub(r'[-_:,\'"+RT]|[a-z]|[📍📌💬🌏]|[✔▶]|\[|\]|\*|\(|\)|\.\.\.+|[…]|\.\.+', ' ', text)
     # Remove extra brakets
     text=text.strip()
@@ -88,13 +55,11 @@ def clean_text(text):
     text=remove_stopwords(text)
     return text
 
-# Apply the clean_text function to the 'Tweet' column
+# Apply the clean_text function to the 'Tweets' column
 df['Tweets']=df['Raw_Tweet'].apply(clean_text)
 
 df.head()
 
-
-#documents = [line.strip() for line in df.cleanedtext]
 documents = [line.strip() for line in df.Tweets]
 preprocessed_documents = []
 
@@ -105,15 +70,18 @@ for line in tqdm(documents):
 text=''.join(preprocessed_documents[:10000])
 text=text.split('.')
 
+#We apply BERTopic to Korean text, and thus want to use Mecab as a tokenizer instead
 class CustomTokenizer:
     def __init__(self, tagger):
         self.tagger = tagger
     def __call__(self, sent):
         sent = sent[:1000000]
-        word_tokens = self.tagger.nouns(sent) #word_tokens = self.tagger.morphs(sent)
+        word_tokens = self.tagger.nouns(sent) #we keep only the nouns for clarity with tagger.nouns . To keep all words: word_tokens = self.tagger.morphs(sent)
         result = [word for word in word_tokens if len(word) > 1]
         return result
-    
+
+#This seed topic list pushes the model towards the defined topics, IF they exist. 
+
 seed_topic_list = [['실업', '일자리', '작업 경쟁','취업 경쟁','직장 잃','경쟁'], #1. Common Arguments against Immigration: “immigrants take jobs, lower wages, hurt the poor” (ref: https://www.cato.org/blog/14-most-common-arguments-against-immigration-why-theyre-wrong)
                    ['건강 보험', '병원', '복지','보건의료사비스', '보건의료', '보건의료요구','의료 혜택',  '보험 혜택',  '의료', '건강', '의료혜택','보건의료정책','IHS', 'NHS','의료 서비스', '사회복지'], #2. Common Arguments against Immigration : “ abuse welfare”
                    ['세금','불경기'], #3. Common Arguments against Immigration: “increase budget deficit and government debt”
@@ -156,7 +124,7 @@ seed_topic_list = [['실업', '일자리', '작업 경쟁','취업 경쟁','직�
                    ['한국','한국인'], #(added topic)
                    ['일본','일본어'], #(added topic)
                    ['이주노','동자'], #(added topic)
-                   ['개인','사람','나라','카드','생각']] #(added topic)
+                   ['개인','사람','나라','카드','생각']] #(added topic to decrease the overlapping of topics)
 
     
 custom_tokenizer = CustomTokenizer(Mecab())
@@ -164,50 +132,32 @@ vectorizer = CountVectorizer(tokenizer=custom_tokenizer, max_features=3000)
 
 representation_model = MaximalMarginalRelevance(diversity=0.3)
 
-umap_model = UMAP(n_neighbors=15, n_components=5, min_dist=0.0, metric='cosine') #reduce dimensionality
-hdbscan_model = HDBSCAN(min_cluster_size=15, metric='euclidean', cluster_selection_method='eom', prediction_data=True) #Cluster reduced embeddings
-ctfidf_model = ClassTfidfTransformer() # Create topic representation
+umap_model = UMAP(n_neighbors=15, n_components=5, min_dist=0.0, metric='cosine') #reduce dimensionality # neighbords, components, can be updated to decrease topic overlapping
 
-model = BERTopic(embedding_model="sentence-transformers/xlm-r-100langs-bert-base-nli-stsb-mean-tokens", \
+model = BERTopic(embedding_model="sentence-transformers/xlm-r-100langs-bert-base-nli-stsb-mean-tokens", \  #we use this model for Korean text
                  vectorizer_model=vectorizer,
-                 #representation_model=representation_model,
-                 umap_model=umap_model,              # Step 2 - Reduce dimensionality
-                 #hdbscan_model=hdbscan_model,        # Step 3 - Cluster reduced embeddings
-                 #ctfidf_model=ctfidf_model,          # Step 5 - Extract topic words
+                 umap_model=umap_model,      # Reduce dimensionality
                  seed_topic_list=seed_topic_list,
-                 min_topic_size=35,
-                 nr_topics=31,
-                 #nr_topics="auto",
-                 top_n_words=20,
+                 min_topic_size=35, 
+                 nr_topics=31, #can be changed to "auto"
+                 top_n_words=20, 
                  calculate_probabilities=True)
 
 
-
-
-topics, probs = model.fit_transform(documents) # Train your BERTopic model
+topics, probs = model.fit_transform(documents) # Train the BERTopic model
 new_topics = model.reduce_outliers(documents, topics) # Reduce outliers
 
-# Use the "c-TF-IDF" strategy with a threshold
-#new_topics = model.reduce_outliers(documents, new_topics , strategy="c-tf-idf", threshold=0.1)
+model.save('topics2012.h5')
 
-# Reduce all outliers that are left with the "distributions" strategy
-#new_topics = model.reduce_outliers(documents, topics, strategy="distributions")
-model.update_topics(documents, topics=new_topics)
+# %% 
 
-#ng20222avril.
+#Now for the results
 
-
-
-#model.reduce_topics(documents, nr_topics=30)
-#model.save('ngarticles.h5')
-model.save('topics20122.h5')
-
-
-
-
-for i in range(0, 55): 
+for i in range(0, 32): 
   print(i,'번째 토픽 :', model.get_topic(i))
 
+# %% 
+#To find the most similar topics for a specific word (here, "여성" )
 
 similar_topics, similarity = \
 model.find_topics("여성", top_n = 10) 
@@ -221,78 +171,63 @@ print("Similarity Score: {}".format(similarity[1]))
 print("\n Most Similar Topic Info: \n{}".format(model.get_topic(similar_topics[2])))
 print("Similarity Score: {}".format(similarity[2]))
 
-#2012
 
 # %%
-
 model.get_representative_docs()
 model.get_topic_info()
 model.get_topics()
 model.generate_topic_labels()
 
-
 # %%
+#Visualization of the results: how to plot an interactive graph html
+
 import chart_studio.plotly as py
 import plotly.graph_objects as go
 
-
-#chart_studio.tools.set_credentials_file(username='claraclara', api_key='KnIGBIGbrwbmg8q8bdpn')
-
-###
-
 fig = model.visualize_barchart()
-fig.write_html("20122barchart.html")
+fig.write_html("2012barchart.html")
 fig.show()
 
 fig = model.visualize_topics()
-fig.write_html("20122topics.html")
+fig.write_html("2012topics.html")
 fig.show()
-
 
 fig = model.visualize_hierarchy()
-fig.write_html("20122hierarchy.html")
+fig.write_html("2012hierarchy.html")
 fig.show()
-
 
 fig = model.visualize_heatmap()
-fig.write_html("20122heatmap.html")
+fig.write_html("2012heatmap.html")
 fig.show()
-
 
 fig = model.visualize_term_rank()
-fig.write_html("20122termrank.html")
+fig.write_html("2012termrank.html")
 fig.show()
-
 
 fig = model.visualize_term_rank(log_scale=True)
-fig.write_html("20122logtermrank.html")
+fig.write_html("2012logtermrank.html")
 fig.show()
-
-
 
 
 # %%
+#the visualization of the topics overtime takes longer, so it is separated into another cell
 
 import chart_studio.plotly as py
 import plotly.graph_objects as go
 
-
-#chart_studio.tools.set_credentials_file(username='claraclara', api_key='KnIGBIGbrwbmg8q8bdpn')
-
 topics_over_time = model.topics_over_time(documents, timestamps)
 fig = model.visualize_topics_over_time(topics_over_time)
-fig.write_html("20122topicstime.html")
+fig.write_html("2012topicstime.html")
 fig.show()
 
 
 # %%
-
-
+#If we only want images, no interactvie graphs html, visualization can be done as:
 
 topics_over_time = model.topics_over_time(documents, timestamps)
-model.visualize_topics_over_time(topics_over_time, top_n_topics=30)
+model.visualize_topics_over_time(topics_over_time, top_n_topics=10)
 model.visualize_topics_over_time(topics_over_time)
-#avril16.
+
 
 model.visualize_topics()
 model.visualize_distribution(probs[0])
@@ -305,42 +240,3 @@ model.visualize_heatmap()
 model.visualize_term_rank()
 model.visualize_term_rank(log_scale=True)
 model.generate_topic_labels()
-
-#bert2021.
-
-
-# %%
-''''''
-from bertopic import BERTopic
-import gensim.corpora as corpora
-from gensim.models.coherencemodel import CoherenceModel
-
-topic_model = BERTopic(n_gram_range=(2, 3), min_topic_size=5)
-topics, _ = topic_model.fit_transform(docs)
-cleaned_docs = topic_model._preprocess_text(docs)
-vectorizer = topic_model.vectorizer_model
-analyzer = vectorizer.build_analyzer()
-tokens = [analyzer(doc) for doc in cleaned_docs]
-dictionary = corpora.Dictionary(tokens)
-corpus = [dictionary.doc2bow(token) for token in tokens]
-topics = topic_model.get_topics()
-topics.pop(-1, None)
-topic_words = [
-    [word for word, _ in topic_model.get_topic(topic) if word != ""] for topic in topics
- ]
- topic_words = [[words for words, _ in topic_model.get_topic(topic)] 
-            for topic in range(len(set(topics))-1)]
-''''''
-
- # Evaluate
-from bertopic import BERTopic
-import gensim
-from gensim import corpora
-import gensim.corpora as corpora
-from gensim.models.coherencemodel import CoherenceModel
-coherence_model = CoherenceModel(topics=topics, 
-                             texts=tokens, 
-                             corpus=corpus,
-                             dictionary=dictionary, 
-                             coherence='c_v')
-coherence = coherence_model.get_coherence()
