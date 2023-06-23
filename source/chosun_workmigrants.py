@@ -1,4 +1,5 @@
 # coding: utf-8
+#scraping news articles with webdriver and selenium
 #code for jupyter notebook (in order to use selenium and webchromedriver)
 
 #!pip install selenium
