@@ -1,3 +1,7 @@
+The shaping of the narrative on migration: A corpus assisted quantitative discourse analysis of the impact of the divisive media framing of migrants in Korea
+
+This work explores the shaping of public opinion on migration in South Korea by utilizing BERT topic modelings (Dimo 2020; Grootendorst 2022). Data are the public discourse on Twitter and the three biggest local newspapers. The study examines the content of these topics, highlighting key themes and their implications. Predominant topics are found to be sources of union, with topics centering around shared experiences as migrants struggling with visa regulations, as language learners, and as friends interested in sharing culture. The findings through BERTopic modeling as a tool of discourse analysis on large data shows a complex narrative creating distinctive concepts of migrants, divided into clustered groups to justify confrontational arguments and ensure the potential for union against the exploitative capitalist government policies is limited by the alienation from native workers, rather than a simple overall negative media narrative.  
+
 .BERTopic for Korean Data
 
 The Topic model BERTopic is performed with a Mecab package from konlpy.
