@@ -29,6 +29,9 @@ mecab.nouns function is used.
 2) Topic modeling
 3) Dynamic, seeded topic modeling
 
+![workflow](https://github.com/clara1del/BERTopic-korean-tweets-newsarticles-migration-discourse/assets/120312491/19583f71-40c1-4ff0-a2f1-5aea0795fe4d)
+
+
 .Results
 
 Results are limited by the overlapping of topics.
