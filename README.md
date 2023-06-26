@@ -5,7 +5,10 @@ The codes and corpora in this repository are from a project exploring the shapin
 
 The findings through BERTopic modeling as a tool of discourse analysis on large data shows that, rather than a simple overall negative media narrative, the news outlets create distinctive concepts of migrants, fragmented into clustered groups, alienated from each other based on their social identities, migration status, and citizenship status. Discriminatory tropes (such as a criminalization frame and a victimization frame) predominant in the Mass Media corpus, are less salient in the New Media corpus and the Public Opinion (Tweets) corpus, where topics of compassion, human rights, union, reports of shared experiences, desire to share culture and communicate, are predominant.
 
-With the c-TF IDF formula giving the significance of words per topic, the fragmentation of one group (for example, refugees) into vastly distanced topics (either in the victimization frame, with "kid" and "refugee" in one cluster, or the criminalization frame, with "refugee" and "terrorism" in one cluster) , which creates a divisive concept of refugees. This division in the public narrative supports the division in the governemental policies, where refugees are divided into "humanitarian" or "economic" refugee categories. Asylum seekers placed in the "economic" refugee category are denied the refugee status.
+With the c-TF IDF formula giving the significance of words per topic,  the creation of a divisive concept of refugees is visualized, with the fragmentation of one group (for example, refugees) into vastly distanced topics (either in the victimization frame, with "kid" and "refugee" in one cluster, or the criminalization frame, with "refugee" and "terrorism" in one cluster).
+This division in the public narrative supports the division in the governemental policies. For example, the Ministry of Justice divides asylum seekers applying for a refugee Visa into "humanitarian" or "economic" refugee categories. Asylum seekers placed in the "economic" refugee category are denied the refugee status.
+
+The intertopic distance maps illustrates this shaping of divisive semantic meanings.
 
 
 .BERTopic for Korean Data
