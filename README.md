@@ -23,16 +23,17 @@ The corpus of descriptions of news articles has been scraped with the Naver API.
 
 mecab.nouns function is used.
 
-.Usage
-
-1) Word embeddings
-2) Topic modeling
-3) Dynamic, seeded topic modeling
 
 ![workflow](https://github.com/clara1del/BERTopic-korean-tweets-newsarticles-migration-discourse/assets/120312491/19583f71-40c1-4ff0-a2f1-5aea0795fe4d)
 
 
 .Results
 
-Results are limited by the overlapping of topics.
+Results are limited by the overlapping of topics. Some examples of the visualization are:
+
+![1new22_23map](https://github.com/clara1del/BERTopic-korean-tweets-newsarticles-migration-discourse/assets/120312491/9b8babd5-2d47-4d27-b9ac-11bcb20e0efb)
+
+![massmedia2009_23_inter](https://github.com/clara1del/BERTopic-korean-tweets-newsarticles-migration-discourse/assets/120312491/a2067ed1-5bfc-496a-a4aa-4a0fcc7373c8)
+
+
 
