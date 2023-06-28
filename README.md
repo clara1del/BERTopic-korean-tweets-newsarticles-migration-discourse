@@ -35,6 +35,12 @@ mecab.nouns function is used.
 
 ![workflow](https://github.com/clara1del/BERTopic-korean-tweets-newsarticles-migration-discourse/assets/120312491/19583f71-40c1-4ff0-a2f1-5aea0795fe4d)
 
+.Source Code
+![Screenshot (2006)](https://github.com/clara1del/BERTopic-korean-tweets-newsarticles-migration-discourse/assets/120312491/95461254-ff59-4e5a-8806-974bc1f85372)
+![Screenshot (2007)](https://github.com/clara1del/BERTopic-korean-tweets-newsarticles-migration-discourse/assets/120312491/8edfd36a-ad96-4e1d-92d8-0c3f4646c50b)
+![Screenshot (2008)](https://github.com/clara1del/BERTopic-korean-tweets-newsarticles-migration-discourse/assets/120312491/377a0f66-b964-4c84-b887-0958bf29128a)
+
+
 
 .Results
 
